@@ -13,6 +13,11 @@ else {
 	var listening_frequency = 162.550;   // MHZ --> adapt
 }
 
+///////// Get hostname from system
+var buffer='';
+var command=IO.fread('/etc/hostname',buffer);
+var hostname =/.*/.exec(command)[0] 
+print('Hostname: ',command);
 
 // We set a 250kHz shift to avoid the DC center spike.
 var offset_center = 250e3; // offset from center (unit Hz)

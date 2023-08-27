@@ -7,11 +7,11 @@ if (use_mqtt) {
         'host': mqtt_server,
         'login': '',
         'pass' : '',
-        'topic': 'SDR/station_1/rms',
+        'topic': 'SDR/' + hostname + '/rms',
         'mode' : 'write' 
 	};
 
-	print('Create MQTT : SDR/station_1/rms');
+	print('Create MQTT : SDR/' + hostname + '/rms');
 	MBoxCreate('rms1',stations_rms);
 }
 
@@ -19,7 +19,7 @@ var counter = 0; //keep track of the number of times the recording loops
 var whisper_box = new SharedMap('dictionnary_1');
 
 IO.fdelete('/tmp/tasks.txt');
-IO.fwrite('/tmp/tasks.txt','{"task": [],"file": []}');
+IO.fwrite('/tmp/tasks.txt','{"task": [],"file": [], "hostname": [], "frequency": [], "date": []}');
 
 var whispid = createTask('start_whisper.js');
 // In case of trouble, launch `start_whisper_solo.js` from a separate window, and comment above line.
@@ -132,7 +132,9 @@ while( fifo_from_rx.isFromRx()) { // if we have something in the input
                 if (recording == 1) {
                     print('End record');
                     IO.fdelete('/tmp/null.cs8');
-                    createTask('FM_demod.js', new_file, nbfm_bandwidth);
+                    var frequency = (rx.getRxCenterFreq() + (offset_center/1e6)).toFixed(3)
+                    print('Frequency: ', frequency)
+                    createTask('FM_demod.js', new_file, nbfm_bandwidth, datenow, frequency);
                 }
                 if (debug) {
                     print(iflevel.toFixed(2), '  *** No signal !  - Trigger : ', trigger.toFixed(2));
